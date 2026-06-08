@@ -1,3 +1,4 @@
+import time
 import torch
 import numpy as np
 
@@ -34,6 +35,8 @@ def train(
     # Episode tracking: each entry is (step_at_which_episode_ended, success_bool)
     episode_log = []
     episode_return = 0.0
+    log_every = max(1, total_steps // 20)
+    t_start = time.perf_counter()
 
     obs, _ = env.reset(seed=seed)
     for step in range(total_steps):
@@ -55,6 +58,21 @@ def train(
 
         if step % target_update_every == 0:
             agent.sync_target()
+
+        if step > 0 and step % log_every == 0:
+            elapsed = time.perf_counter() - t_start
+            steps_per_sec = step / elapsed
+            eta = (total_steps - step) / steps_per_sec
+            recent = episode_log[-50:] if episode_log else []
+            success_rate = sum(s for _, s in recent) / len(recent) if recent else 0.0
+            print(
+                f"step {step}/{total_steps} "
+                f"({100*step/total_steps:.0f}%) | "
+                f"eps {agent._epsilon(step):.3f} | "
+                f"success {success_rate:.2f} (last {len(recent)} ep) | "
+                f"{steps_per_sec:.0f} steps/s | "
+                f"ETA {eta:.0f}s"
+            )
 
     env.close()
 
