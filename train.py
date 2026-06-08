@@ -1,33 +1,9 @@
 import torch
 
+from agents.dqn import DQNAgent
 from agents.replay_buffer import ReplayBuffer
-
-
-# Placeholders. Each gets extracted into its own module once fleshed out:
-#   make_env -> envs/make_env.py
-#   Uniform  -> curriculum/uniform.py
-#   DQNAgent -> agents/dqn.py
-def make_env(env_id, selector, seed):
-    raise NotImplementedError
-
-
-class Uniform:
-    def __init__(self, seed):
-        raise NotImplementedError
-
-
-class DQNAgent:
-    def __init__(self, obs_dim, n_actions, device):
-        raise NotImplementedError
-
-    def act(self, obs, step):
-        raise NotImplementedError
-
-    def update(self, batch):
-        raise NotImplementedError
-
-    def sync_target(self):
-        raise NotImplementedError
+from curriculum.uniform import Uniform
+from envs.make_env import make_env
 
 
 def train(
