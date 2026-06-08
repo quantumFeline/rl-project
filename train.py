@@ -19,12 +19,16 @@ def train(
     target_update_every: int = 1_000,
     seed: int = 0,
     device: torch.device = None,
+    selector=None,
+    fixed_goal: tuple[int, int] | None = None,
+    max_steps: int | None = None,
 ):
     if device is None:
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    selector = Uniform(seed=seed)
-    env = make_env(env_id, selector, seed=seed)
+    if selector is None:
+        selector = Uniform(seed=seed)
+    env = make_env(env_id, selector, seed=seed, fixed_goal=fixed_goal, max_steps=max_steps)
 
     obs_dim = env.observation_space.shape[0]
     n_actions = env.action_space.n

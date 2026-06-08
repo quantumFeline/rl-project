@@ -12,26 +12,46 @@ NUM_DIRS = 4
 
 
 class StartStateWrapper(gym.Wrapper):
-    """Overrides the agent's start position each episode using a curriculum selector."""
+    """Overrides agent start position (and optionally goal) each episode."""
 
-    def __init__(self, env, selector):
+    def __init__(self, env, selector, fixed_goal: tuple[int, int] | None = None):
         super().__init__(env)
         self.selector = selector
+        self.fixed_goal = fixed_goal
 
     def reset(self, **kwargs):
         obs, info = self.env.reset(**kwargs)
+        base = self.unwrapped
+
+        if self.fixed_goal is not None:
+            self._pin_goal(base)
 
         # Let the selector know which cells are free (it may cache this).
-        self.selector.set_grid(self.unwrapped)
+        # Called after goal pinning so the goal cell is excluded from free cells.
+        self.selector.set_grid(base)
 
         col, row = self.selector.sample()
-        direction = self.unwrapped.np_random.integers(0, NUM_DIRS)
+        direction = base.np_random.integers(0, NUM_DIRS)
 
-        self.unwrapped.agent_pos = np.array([col, row])
-        self.unwrapped.agent_dir = int(direction)
+        base.agent_pos = np.array([col, row])
+        base.agent_dir = int(direction)
 
-        obs = self.unwrapped.gen_obs()
+        obs = base.gen_obs()
         return obs, info
+
+    def _pin_goal(self, base) -> None:
+        from minigrid.core.world_object import Goal
+
+        grid = base.grid
+        # Remove existing goal(s)
+        for x in range(base.width):
+            for y in range(base.height):
+                cell = grid.get(x, y)
+                if cell is not None and cell.type == "goal":
+                    grid.set(x, y, None)
+        # Place goal at the fixed position
+        gx, gy = self.fixed_goal
+        grid.set(gx, gy, Goal())
 
 
 class PosObsWrapper(gym.ObservationWrapper):
