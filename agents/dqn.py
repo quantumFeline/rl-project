@@ -29,6 +29,7 @@ class DQNAgent:
         device: torch.device,
         lr: float = 5e-4,
         gamma: float = 0.99,
+        tau: float = 0.005,
         epsilon_start: float = 1.0,
         epsilon_end: float = 0.1,
         epsilon_decay_steps: int = 80_000,
@@ -36,6 +37,7 @@ class DQNAgent:
         self.n_actions = n_actions
         self.device = device
         self.gamma = gamma
+        self.tau = tau
 
         self.epsilon_start = epsilon_start
         self.epsilon_end = epsilon_end
@@ -90,8 +92,13 @@ class DQNAgent:
         nn.utils.clip_grad_norm_(self.q_net.parameters(), max_norm=10.0)
         self.optimizer.step()
 
+        self._soft_update_target()
+
         return td_error.abs().detach().cpu().numpy()
 
+    def _soft_update_target(self) -> None:
+        for tp, op in zip(self.target_net.parameters(), self.q_net.parameters()):
+            tp.data.copy_(self.tau * op.data + (1.0 - self.tau) * tp.data)
+
     def sync_target(self) -> None:
-        """Hard-copy Q-network weights into the target network."""
         self.target_net.load_state_dict(self.q_net.state_dict())

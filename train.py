@@ -70,9 +70,6 @@ def train(
                 grid_h=env.unwrapped.height,
             )
 
-        if step % target_update_every == 0:
-            agent.sync_target()
-
         if step > 0 and step % log_every == 0:
             elapsed = time.perf_counter() - t_start
             steps_per_sec = step / elapsed
