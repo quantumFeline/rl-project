@@ -22,9 +22,12 @@ class Reverse(StartSelector):
         self.max_dist = initial_band
         self.expand_threshold = expand_threshold
 
-        # Rolling window of recent episode outcomes for expansion decisions
+        # Only frontier episodes count towards expansion
         self.window = window
-        self.recent_successes: list[bool] = []
+        self.frontier_successes: list[bool] = []
+
+        # Distance of the most recent episode's start cell
+        self._last_start_dist: int = 0
 
         # Populated on first set_grid call
         self.dist_map: dict[tuple[int, int], int] = {}
@@ -54,15 +57,24 @@ class Reverse(StartSelector):
             candidates = self.cells_by_dist.get(1, [])
 
         idx = self.rng.integers(0, len(candidates))
-        return candidates[idx]
+        cell = candidates[idx]
+        self._last_start_dist = self.dist_map[cell]
+        return cell
 
-    def update(self, *, success: bool, **kwargs) -> None:
-        self.recent_successes.append(success)
-        if len(self.recent_successes) > self.window:
-            self.recent_successes.pop(0)
+    def update(self, *, success: bool | None = None, **kwargs) -> None:
+        if success is None:
+            return
 
-        if len(self.recent_successes) >= self.window:
-            rate = sum(self.recent_successes) / len(self.recent_successes)
+        # Only count episodes that started on the frontier ring
+        if self._last_start_dist < self.max_dist:
+            return
+
+        self.frontier_successes.append(success)
+        if len(self.frontier_successes) > self.window:
+            self.frontier_successes.pop(0)
+
+        if len(self.frontier_successes) >= self.window:
+            rate = sum(self.frontier_successes) / len(self.frontier_successes)
             if rate >= self.expand_threshold and self.max_dist < self.max_possible_dist:
                 self.max_dist += 1
-                self.recent_successes.clear()
+                self.frontier_successes.clear()

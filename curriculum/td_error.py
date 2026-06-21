@@ -39,8 +39,9 @@ class TDError(StartSelector):
         idx = self.rng.choice(len(self.free_cells), p=probs)
         return self.free_cells[idx]
 
-    def update(self, *, obs_batch: np.ndarray, td_errors: np.ndarray,
-               grid_w: int, grid_h: int, **kwargs) -> None:
+    def update(self, *, obs_batch: np.ndarray | None = None,
+               td_errors: np.ndarray | None = None,
+               grid_w: int = 0, grid_h: int = 0, **kwargs) -> None:
         """Update per-cell TD error estimates.
 
         Args:
@@ -49,6 +50,8 @@ class TDError(StartSelector):
             grid_w: grid width, for denormalizing obs back to cell coordinates.
             grid_h: grid height, for denormalizing obs back to cell coordinates.
         """
+        if obs_batch is None or td_errors is None:
+            return
         for i in range(len(td_errors)):
             col = int(round(obs_batch[i, 0] * (grid_w - 1)))
             row = int(round(obs_batch[i, 1] * (grid_h - 1)))

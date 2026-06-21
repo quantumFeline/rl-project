@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -30,6 +32,7 @@ def plot_success_rate(
         else:
             smoothed[i] = (cumsum[i] - cumsum[i - window]) / window
 
+    Path(save_path).parent.mkdir(parents=True, exist_ok=True)
     plt.figure(figsize=(8, 4))
     plt.plot(steps, smoothed)
     plt.xlabel("Environment steps")
@@ -40,3 +43,43 @@ def plot_success_rate(
     plt.savefig(save_path, dpi=100)
     plt.close()
     print(f"Saved plot to {save_path}")
+
+
+def smooth(successes: np.ndarray, window: int = 50) -> np.ndarray:
+    window = min(window, len(successes))
+    cumsum = np.cumsum(successes)
+    smoothed = np.empty(len(successes))
+    for i in range(len(successes)):
+        if i < window:
+            smoothed[i] = cumsum[i] / (i + 1)
+        else:
+            smoothed[i] = (cumsum[i] - cumsum[i - window]) / window
+    return smoothed
+
+
+def plot_comparison(
+    results: dict[str, tuple[np.ndarray, np.ndarray]],
+    window: int = 50,
+    save_path: str = "curves/comparison.png",
+):
+    """Plot multiple selectors on one figure.
+
+    Args:
+        results: {selector_name: (steps_array, successes_array)}
+    """
+    Path(save_path).parent.mkdir(parents=True, exist_ok=True)
+    plt.figure(figsize=(10, 5))
+
+    for name, (steps, successes) in results.items():
+        smoothed = smooth(successes, window)
+        plt.plot(steps, smoothed, label=name)
+
+    plt.xlabel("Environment steps")
+    plt.ylabel(f"Success rate (rolling {window} episodes)")
+    plt.ylim(-0.05, 1.05)
+    plt.legend()
+    plt.title("Selector comparison")
+    plt.tight_layout()
+    plt.savefig(save_path, dpi=150)
+    plt.close()
+    print(f"Saved comparison plot to {save_path}")

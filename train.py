@@ -20,6 +20,7 @@ def train(
     seed: int = 0,
     device: torch.device = None,
     selector=None,
+    selector_name: str = "uniform",
     fixed_goal: tuple[int, int] | None = None,
     max_steps: int | None = None,
 ):
@@ -88,14 +89,67 @@ def train(
 
     env.close()
 
-    # Plot learning curve
+    steps_arr = np.array([s for s, _ in episode_log])
+    successes_arr = np.array([float(s) for _, s in episode_log])
+
+    # Plot individual learning curve
     if episode_log:
-        steps = np.array([s for s, _ in episode_log])
-        successes = np.array([float(s) for _, s in episode_log])
-        plot_success_rate(steps, successes)
+        from datetime import datetime
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        env_short = env_id.replace("MiniGrid-", "").replace("-v0", "").lower()
+        save_path = f"curves/{env_short}_{selector_name}_s{seed}_{total_steps // 1000}k_{timestamp}.png"
+        plot_success_rate(steps_arr, successes_arr, save_path=save_path)
+
+    return steps_arr, successes_arr
+
+
+def make_selector(name: str, seed: int, goal: tuple[int, int]):
+    if name == "fixed":
+        from curriculum.fixed import Fixed
+        return Fixed(col=1, row=1)
+    if name == "uniform":
+        from curriculum.uniform import Uniform
+        return Uniform(seed=seed)
+    if name == "reverse":
+        from curriculum.reverse import Reverse
+        return Reverse(goal=goal, seed=seed)
+    if name == "tderror":
+        from curriculum.td_error import TDError
+        return TDError(seed=seed)
+    raise ValueError(f"Unknown selector: {name}")
 
 
 if __name__ == "__main__":
+    import argparse
+
+    parser = argparse.ArgumentParser(description="Train DQN on MiniGrid")
+    parser.add_argument(
+        "--selector", type=str, default="uniform",
+        choices=["fixed", "uniform", "reverse", "tderror"],
+        help="Start-state selector (default: uniform)",
+    )
+    parser.add_argument("--seed", type=int, default=0)
+    parser.add_argument("--total-steps", type=int, default=100_000)
+    parser.add_argument(
+        "--env", type=str, default="MiniGrid-FourRooms-v0",
+        help="MiniGrid environment ID",
+    )
+    args = parser.parse_args()
+
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"device: {device}")
-    train(device=device)
+
+    goal = (17, 1)
+    selector = make_selector(args.selector, args.seed, goal)
+    print(f"selector: {args.selector} | env: {args.env} | seed: {args.seed} | steps: {args.total_steps}")
+
+    train(
+        env_id=args.env,
+        total_steps=args.total_steps,
+        seed=args.seed,
+        device=device,
+        selector=selector,
+        selector_name=args.selector,
+        fixed_goal=goal,
+        max_steps=200,
+    )
