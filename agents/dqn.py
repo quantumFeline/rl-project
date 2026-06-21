@@ -76,9 +76,10 @@ class DQNAgent:
         q_sa = q_values.gather(1, actions.unsqueeze(1))     # (batch, 1)
         q_sa = q_sa.squeeze(1)                              # (batch,)
 
-        # TD target: r + gamma * max_a' Q_target(s', a'), zero future if terminated
+        # Double DQN: online net picks the action, target net evaluates it
         with torch.no_grad():
-            next_q = self.target_net(next_obs).max(dim=1).values
+            best_actions = self.q_net(next_obs).argmax(dim=1)
+            next_q = self.target_net(next_obs).gather(1, best_actions.unsqueeze(1)).squeeze(1)
             td_target = rewards + self.gamma * next_q * (1.0 - terminated)
 
         td_error = td_target - q_sa
