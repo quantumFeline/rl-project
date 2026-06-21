@@ -15,7 +15,7 @@ def train(
     buffer_capacity: int = 100_000,
     batch_size: int = 128,
     learning_starts: int = 1_000,
-    train_every: int = 1,
+    train_every: int = 4,
     target_update_every: int = 1_000,
     seed: int = 0,
     device: torch.device = None,
