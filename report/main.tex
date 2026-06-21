@@ -1,5 +1,5 @@
-% Uses the ICML style (compact, well-suited for 3-4 pages)
-\documentclass[accepted]{icml2024}
+\documentclass{article}
+\usepackage[accepted]{icml2024}
 
 \usepackage{amsmath,amssymb}
 \usepackage{graphicx}
@@ -16,12 +16,12 @@
 \icmlsetsymbol{equal}{*}
 
 \begin{icmlauthorlist}
-\icmlauthor{TODO: Author Name}{todo}
+\icmlauthor{Veronika Nechaieva}{uw}
 \end{icmlauthorlist}
 
-\icmlaffiliation{todo}{TODO: University, Department}
+\icmlaffiliation{uw}{University of Warsaw, Faculty of Mathematics, Informatics, and Mechanics}
 
-\icmlcorrespondingauthor{TODO: Author Name}{veronika.netch@gmail.com}
+\icmlcorrespondingauthor{Veronika Nechaieva}{veronika.netch@gmail.com}
 
 \icmlkeywords{reinforcement learning, curriculum learning, DQN, initial state distribution}
 
@@ -90,13 +90,29 @@ TODO
 % One paragraph each, enough to reproduce.
 
 \subsection{Environments}
-% MiniGrid framework, gymnasium wrappers, observation = [col, row, dir].
-% Three environments:
-% - FourRooms (19x19, standard, BFS = good difficulty proxy)
-% - NineRooms (25x25, custom, more doorways)
-% - DeceptiveRooms (19x19, custom, spiral around goal, BFS != difficulty)
-% Include small grid diagrams or reference appendix figures.
-% Explain goal pinning and why it is necessary.
+All environments use the MiniGrid framework~\cite{minigrid} with a
+minimal observation vector $(\text{col}, \text{row}, \text{dir})$. The
+goal position is pinned (fixed across episodes) to ensure that curriculum selectors compare start states against a stable target; without pinning, MiniGrid randomises the goal on each reset, which confounds the curriculum signal. Figure~\ref{fig:environments} shows the layouts.
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=\columnwidth]{fig_environments.png}
+\caption{Grid layouts for the three environments. \textbf{A}~(blue):
+default agent start; \textbf{G}~(green): goal. Black cells are walls.}
+\label{fig:environments}
+\end{figure}
+
+\paragraph{FourRooms} (19$\times$19, standard MiniGrid). Four rooms
+connected by single-cell doorways. BFS shortest-path distance correlated with difficulty, as cells farther from the goal
+are genuinely harder to solve from.
+
+\paragraph{NineRooms} (25$\times$25, custom). A 3$\times$3 grid of rooms
+with single-cell doorways between all adjacent pairs. The larger state
+space and additional bottlenecks increase the difficulty relative to
+FourRooms.
+
+\paragraph{DeceptiveRooms} (19$\times$19, custom). An open grid with a
+two-ring spiral surrounding the goal. Cells inside the spiral have low BFS distance but require navigating narrow corridors with multiple turns, making them harder than open-area cells at equal or greater BFS distance. This tests whether TD-error-based selection can outperform distance-based methods when BFS distance is a poor difficulty proxy.
 
 % ===========================================================================
 \section{Experiments}
@@ -114,27 +130,98 @@ TODO
 % Per-environment comparison. For each environment:
 % - Learning curve figure (the comparison plot)
 % - 2-3 sentences describing the ranking and key pattern
-% Summary table across all environments (final success, peak success).
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=\columnwidth]{fig_fourrooms.png}
+\caption{Learning curves on FourRooms (100k steps).}
+\label{fig:fourrooms}
+\end{figure}
+
+\paragraph{FourRooms (100k steps).}
+
+\begin{table}[h]
+\caption{Peak rolling-50 success rate on FourRooms.}
+\label{tab:fourrooms}
+\centering
+\begin{tabular}{lcc}
+\toprule
+Selector & 50k & 100k \\
+\midrule
+Fixed    & 0.06 & 0.32 \\
+Uniform  & 0.44 & 0.44 \\
+TDError  & 0.44 & 0.54 \\
+Reverse  & \textbf{1.00} & \textbf{1.00} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=\columnwidth]{fig_ninerooms.png}
+\caption{Learning curves on NineRooms (200k steps).}
+\label{fig:ninerooms}
+\end{figure}
+
+\paragraph{NineRooms (200k steps).}
+
+\begin{table}[h]
+\caption{Peak rolling-50 success rate on NineRooms.}
+\label{tab:ninerooms}
+\centering
+\begin{tabular}{lcccc}
+\toprule
+Selector & 50k & 100k & 150k & 200k \\
+\midrule
+Fixed    & 0.00 & 0.16 & 0.42 & \textbf{1.00} \\
+Uniform  & 0.50 & 0.80 & 0.84 & 0.96 \\
+TDError  & 0.44 & 0.74 & 0.94 & \textbf{1.00} \\
+Reverse  & \textbf{1.00} & \textbf{1.00} & \textbf{1.00} & \textbf{1.00} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{figure}[h]
+\centering
+\includegraphics[width=\columnwidth]{fig_deceptiverooms.png}
+\caption{Learning curves on DeceptiveRooms (150k steps).}
+\label{fig:deceptiverooms}
+\end{figure}
+
+\paragraph{DeceptiveRooms (150k steps).}
+
+\begin{table}[h]
+\caption{Peak rolling-50 success rate on DeceptiveRooms.}
+\label{tab:deceptiverooms}
+\centering
+\begin{tabular}{lccc}
+\toprule
+Selector & 50k & 100k & 150k \\
+\midrule
+Fixed    & 0.00 & 0.12 & 0.14 \\
+Uniform  & 0.48 & 0.98 & \textbf{1.00} \\
+TDError  & 0.38 & 0.98 & \textbf{1.00} \\
+Reverse  & \textbf{1.00} & \textbf{1.00} & \textbf{1.00} \\
+\bottomrule
+\end{tabular}
+\end{table}
 
 % ===========================================================================
 \section{Discussion}
 \label{sec:discussion}
 
-% ~0.5 page. Structure:
-% - Reverse consistently learns fastest. Why: "easy first" inductive bias +
-%   episode count advantage (short near-goal episodes = more reward signal
-%   per env step)
-% - TDError's weakness: no inductive bias early on; needs many episodes to
-%   build meaningful per-cell signal; does not distinguish "hard frontier"
-%   from "impossibly hard right now"
-% - TDError's partial success on DeceptiveRooms: when BFS distance is a poor
-%   difficulty proxy, TDError's agnostic approach is more competitive
-% - Difference from the original paper: PPO (on-policy, no replay) vs DQN
-%   (off-policy, replay buffer). Replay buffer already provides sample reuse,
-%   so curriculum's main benefit shifts from data efficiency to ensuring
-%   reward encounter (coverage argument)
-% - Limitations: single seed (or few seeds), small environments, simplified
-%   observation, no comparison to on-policy methods
+Reverse curriculum consistently learns fastest - it reaches peak success rate within 10,000 to 40,000 environment steps across all three environments. There are two reasons for this advantage. First, knowledge of BFS distances and goal location is implicitly built-in in its training regimen. Second, short, near-goal episodes under it yield higher reward signal, which particularly matters during the early training stages. After enough steps, this early advantage is mostly neutralised - in NineRooms setup, all starting location selection methods ultimately reach the same performance, and likely similar picture would arise in the two other regimen with more training time.
+
+The downside of Reverse curriculum is its lower stability after reaching the stably high performance, in comparison to TDError and Uniform which nearly flatten out after reaching the 100\% performance once. This behaviour does not improve with lower learning rate and/or annealing, and is likely connected to the non-stationary training distribution. The Q-network was trained predominantly on near-goal transitions, and when it gets start states from regions it has less experience with, it degrades. The replay buffer softens this effect but doesn't eliminate it, because near-goal episodes are short (few transitions per episode) while far-start episodes are long (many transitions), so the buffer gradually skews toward the newer, harder transitions.
+
+TD-error-based selection, despite being a more sophisticated mechanism,
+tracks next to Uniform in sample efficiency rather than next to
+Reverse. The presumed reason for this is the cold-start. TDError's per-cell error estimates begin uninformative (initialised at a small floor value), so early-game sampling is effectively uniform random. The curriculum only becomes meaningful after the agent has trained on enough transitions to produce spatially varied TD errors, by which point the Reverse selector has already built a near-complete policy. On DeceptiveRooms, however, where BFS distance is a poor proxy for navigational difficulty, TDError narrows the gap with Reverse and overtakes Uniform, which suggests that learned difficulty signals may have value when geometric priors are misleading. However, it suffers from performance instability even moreso than Reverse.
+
+The off-policy replay buffer and the start-state curriculum complement each other: replay addresses sample \emph{reuse}, while the curriculum addresses reward \emph{encounter} so that the agent sees successful
+trajectories early enough to bootstrap learning.
+
+The main limitations of this study are the small grid environments with a simplified 3-dimensional observation, and no direct comparison to on-policy methods such as the PPO agent used in the original work~\cite{florensa2017reverse}.
 
 % ===========================================================================
 \section{Conclusion}
