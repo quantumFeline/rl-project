@@ -27,7 +27,7 @@ class DQNAgent:
         obs_dim: int,
         n_actions: int,
         device: torch.device,
-        lr: float = 1e-3,
+        lr: float = 1e-4,
         gamma: float = 0.99,
         epsilon_start: float = 1.0,
         epsilon_end: float = 0.05,
@@ -82,10 +82,11 @@ class DQNAgent:
             td_target = rewards + self.gamma * next_q * (1.0 - terminated)
 
         td_error = td_target - q_sa
-        loss = (td_error ** 2).mean()
+        loss = nn.functional.smooth_l1_loss(q_sa, td_target)
 
         self.optimizer.zero_grad()
         loss.backward()
+        nn.utils.clip_grad_norm_(self.q_net.parameters(), max_norm=10.0)
         self.optimizer.step()
 
         return td_error.abs().detach().cpu().numpy()

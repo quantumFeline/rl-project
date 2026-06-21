@@ -92,15 +92,44 @@ def train(
     steps_arr = np.array([s for s, _ in episode_log])
     successes_arr = np.array([float(s) for _, s in episode_log])
 
-    # Plot individual learning curve
+    # Save plot, raw data, and summary
     if episode_log:
         from datetime import datetime
+        from pathlib import Path
+
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         env_short = env_id.replace("MiniGrid-", "").replace("-v0", "").lower()
-        save_path = f"curves/{env_short}_{selector_name}_s{seed}_{total_steps // 1000}k_{timestamp}.png"
-        plot_success_rate(steps_arr, successes_arr, save_path=save_path)
+        base = f"curves/{env_short}_{selector_name}_s{seed}_{total_steps // 1000}k_{timestamp}"
+
+        plot_success_rate(steps_arr, successes_arr, save_path=f"{base}.png")
+        np.savez(f"{base}.npz", steps=steps_arr, successes=successes_arr)
+
+        n_ep = len(successes_arr)
+        tail = successes_arr[-50:] if n_ep >= 50 else successes_arr
+        elapsed = time.perf_counter() - t_start
+        summary = (
+            f"env: {env_id}\n"
+            f"selector: {selector_name}\n"
+            f"seed: {seed}\n"
+            f"total_steps: {total_steps}\n"
+            f"max_steps: {max_steps}\n"
+            f"episodes: {n_ep}\n"
+            f"final_success_rate (last 50 ep): {tail.mean():.3f}\n"
+            f"peak_success_rate (rolling 50): {_peak_rolling(successes_arr, 50):.3f}\n"
+            f"wall_time_s: {elapsed:.1f}\n"
+        )
+        Path(f"{base}.txt").write_text(summary)
+        print(summary)
 
     return steps_arr, successes_arr
+
+
+def _peak_rolling(successes: np.ndarray, window: int) -> float:
+    if len(successes) < window:
+        return successes.mean()
+    cumsum = np.cumsum(successes)
+    rolling = (cumsum[window:] - cumsum[:-window]) / window
+    return float(rolling.max())
 
 
 def make_selector(name: str, seed: int, goal: tuple[int, int]):
