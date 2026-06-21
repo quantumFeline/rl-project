@@ -16,47 +16,77 @@
 \gdef\HyperFirstAtBeginDocument#1{#1}
 \providecommand\HyField@AuxAddToFields[1]{}
 \providecommand\HyField@AuxAddToCoFields[2]{}
-\citation{minigrid}
+\citation{florensa2017reverse}
+\citation{florensa2018automatic}
+\citation{ecoffet2021goexplore}
+\citation{messikommer2024cisb}
+\citation{mnih2015dqn}
+\citation{van2016double}
+\citation{florensa2017reverse}
+\citation{florensa2018automatic}
+\citation{ecoffet2021goexplore}
+\citation{messikommer2024cisb}
 \@writefile{toc}{\contentsline {section}{\numberline {1}Introduction}{1}{section.1}\protected@file@percent }
 \newlabel{sec:intro}{{1}{1}{}{section.1}{}}
 \@writefile{toc}{\contentsline {section}{\numberline {2}Background}{1}{section.2}\protected@file@percent }
 \newlabel{sec:background}{{2}{1}{}{section.2}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {3}Method}{1}{section.3}\protected@file@percent }
-\newlabel{sec:method}{{3}{1}{}{section.3}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.1}Agent}{1}{subsection.3.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.2}Start-State Selectors}{1}{subsection.3.2}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.3}Environments}{1}{subsection.3.3}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Grid layouts for the three environments. \textbf  {A}\nobreakspace  {}(blue): default agent start; \textbf  {G}\nobreakspace  {}(green): goal. Black cells are walls.}}{1}{figure.1}\protected@file@percent }
-\newlabel{fig:environments}{{1}{1}{Grid layouts for the three environments. \textbf {A}~(blue): default agent start; \textbf {G}~(green): goal. Black cells are walls}{figure.1}{}}
-\@writefile{toc}{\contentsline {paragraph}{FourRooms}{1}{figure.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{NineRooms}{1}{figure.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {paragraph}{DeceptiveRooms}{1}{figure.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {4}Experiments}{1}{section.4}\protected@file@percent }
-\newlabel{sec:experiments}{{4}{1}{}{section.4}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.1}DQN Stability}{1}{subsection.4.1}\protected@file@percent }
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.2}Results}{1}{subsection.4.2}\protected@file@percent }
-\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Learning curves on FourRooms (100k steps).}}{1}{figure.2}\protected@file@percent }
-\newlabel{fig:fourrooms}{{2}{1}{Learning curves on FourRooms (100k steps)}{figure.2}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Peak rolling-50 success rate on FourRooms.}}{1}{table.1}\protected@file@percent }
-\newlabel{tab:fourrooms}{{1}{1}{Peak rolling-50 success rate on FourRooms}{table.1}{}}
-\@writefile{toc}{\contentsline {paragraph}{FourRooms (100k steps).}{1}{figure.3}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Deep Q-Networks.}{1}{section.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Curriculum over initial states.}{1}{section.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Related approaches.}{1}{section.2}\protected@file@percent }
+\citation{van2016double}
+\citation{florensa2017reverse}
+\citation{florensa2018automatic}
+\citation{minigrid}
+\@writefile{toc}{\contentsline {paragraph}{Gap.}{2}{section.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {3}Method}{2}{section.3}\protected@file@percent }
+\newlabel{sec:method}{{3}{2}{}{section.3}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.1}Agent}{2}{subsection.3.1}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {1}{\ignorespaces Agent hyperparameters.}}{2}{table.1}\protected@file@percent }
+\newlabel{tab:hyperparams}{{1}{2}{Agent hyperparameters}{table.1}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2}Start-State Selectors}{2}{subsection.3.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Fixed.}{2}{subsection.3.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Uniform.}{2}{subsection.3.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Reverse.}{2}{subsection.3.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{TDError.}{2}{subsection.3.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.3}Environments}{2}{subsection.3.3}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Grid layouts for the three environments. \textbf  {A}\nobreakspace  {}(blue): default agent start; \textbf  {G}\nobreakspace  {}(green): goal. Black cells are walls.}}{2}{figure.1}\protected@file@percent }
+\newlabel{fig:environments}{{1}{2}{Grid layouts for the three environments. \textbf {A}~(blue): default agent start; \textbf {G}~(green): goal. Black cells are walls}{figure.1}{}}
+\citation{van2016double}
+\@writefile{toc}{\contentsline {paragraph}{FourRooms}{3}{figure.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{NineRooms}{3}{figure.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{DeceptiveRooms}{3}{figure.1}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {4}Experiments}{3}{section.4}\protected@file@percent }
+\newlabel{sec:experiments}{{4}{3}{}{section.4}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.1}DQN Stability}{3}{subsection.4.1}\protected@file@percent }
+\newlabel{sec:stability}{{4.1}{3}{}{subsection.4.1}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.2}Results}{3}{subsection.4.2}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{FourRooms (100k steps).}{3}{figure.2}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Learning curves on FourRooms (100k steps).}}{3}{figure.2}\protected@file@percent }
+\newlabel{fig:fourrooms}{{2}{3}{Learning curves on FourRooms (100k steps)}{figure.2}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces Peak rolling-50 success rate on FourRooms.}}{3}{table.2}\protected@file@percent }
+\newlabel{tab:fourrooms}{{2}{3}{Peak rolling-50 success rate on FourRooms}{table.2}{}}
+\@writefile{toc}{\contentsline {paragraph}{NineRooms (200k steps).}{3}{figure.3}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {3}{\ignorespaces Peak rolling-50 success rate on NineRooms.}}{3}{table.3}\protected@file@percent }
+\newlabel{tab:ninerooms}{{3}{3}{Peak rolling-50 success rate on NineRooms}{table.3}{}}
+\@writefile{toc}{\contentsline {paragraph}{DeceptiveRooms (150k steps).}{3}{figure.4}\protected@file@percent }
 \citation{florensa2017reverse}
 \bibdata{refs}
 \bibcite{minigrid}{{1}{2023}{{Chevalier-Boisvert et~al.}}{{Chevalier-Boisvert, Dai, Towers, de~Lazcano, Willems, Lahlou, Pal, Castro, and Terry}}}
-\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Learning curves on NineRooms (200k steps).}}{2}{figure.3}\protected@file@percent }
-\newlabel{fig:ninerooms}{{3}{2}{Learning curves on NineRooms (200k steps)}{figure.3}{}}
-\@writefile{lot}{\contentsline {table}{\numberline {2}{\ignorespaces Peak rolling-50 success rate on NineRooms.}}{2}{table.2}\protected@file@percent }
-\newlabel{tab:ninerooms}{{2}{2}{Peak rolling-50 success rate on NineRooms}{table.2}{}}
-\@writefile{toc}{\contentsline {paragraph}{NineRooms (200k steps).}{2}{figure.4}\protected@file@percent }
-\@writefile{lot}{\contentsline {table}{\numberline {3}{\ignorespaces Peak rolling-50 success rate on DeceptiveRooms.}}{2}{table.3}\protected@file@percent }
-\newlabel{tab:deceptiverooms}{{3}{2}{Peak rolling-50 success rate on DeceptiveRooms}{table.3}{}}
-\@writefile{toc}{\contentsline {paragraph}{DeceptiveRooms (150k steps).}{2}{table.3}\protected@file@percent }
-\@writefile{toc}{\contentsline {section}{\numberline {5}Discussion}{2}{section.5}\protected@file@percent }
-\newlabel{sec:discussion}{{5}{2}{}{section.5}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Learning curves on DeceptiveRooms (150k steps).}}{2}{figure.4}\protected@file@percent }
-\newlabel{fig:deceptiverooms}{{4}{2}{Learning curves on DeceptiveRooms (150k steps)}{figure.4}{}}
-\bibcite{florensa2017reverse}{{2}{2017}{{Florensa et~al.}}{{Florensa, Held, Welling, and Abbeel}}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Learning curves on NineRooms (200k steps).}}{4}{figure.3}\protected@file@percent }
+\newlabel{fig:ninerooms}{{3}{4}{Learning curves on NineRooms (200k steps)}{figure.3}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Learning curves on DeceptiveRooms (150k steps).}}{4}{figure.4}\protected@file@percent }
+\newlabel{fig:deceptiverooms}{{4}{4}{Learning curves on DeceptiveRooms (150k steps)}{figure.4}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {5}Discussion}{4}{section.5}\protected@file@percent }
+\newlabel{sec:discussion}{{5}{4}{}{section.5}{}}
+\@writefile{lot}{\contentsline {table}{\numberline {4}{\ignorespaces Peak rolling-50 success rate on DeceptiveRooms.}}{4}{table.4}\protected@file@percent }
+\newlabel{tab:deceptiverooms}{{4}{4}{Peak rolling-50 success rate on DeceptiveRooms}{table.4}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {6}Conclusion}{4}{section.6}\protected@file@percent }
+\newlabel{sec:conclusion}{{6}{4}{}{section.6}{}}
+\bibcite{ecoffet2021goexplore}{{2}{2021}{{Ecoffet et~al.}}{{Ecoffet, Huizinga, Lehman, Stanley, and Clune}}}
+\bibcite{florensa2017reverse}{{3}{2017}{{Florensa et~al.}}{{Florensa, Held, Welling, and Abbeel}}}
+\bibcite{florensa2018automatic}{{4}{2018}{{Florensa et~al.}}{{Florensa, Held, Geng, and Abbeel}}}
+\bibcite{messikommer2024cisb}{{5}{2024}{{Messikommer et~al.}}{{Messikommer, Song, and Scaramuzza}}}
+\bibcite{mnih2015dqn}{{6}{2015}{{Mnih et~al.}}{{Mnih, Kavukcuoglu, Silver, Rusu, Veness, Bellemare, Graves, Riedmiller, Fidjeland, Ostrovski, et~al.}}}
+\bibcite{van2016double}{{7}{2016}{{Van~Hasselt et~al.}}{{Van~Hasselt, Guez, and Silver}}}
 \bibstyle{icml2024}
-\@writefile{toc}{\contentsline {section}{\numberline {6}Conclusion}{3}{section.6}\protected@file@percent }
-\newlabel{sec:conclusion}{{6}{3}{}{section.6}{}}
-\gdef \@abspage@last{3}
+\gdef \@abspage@last{5}

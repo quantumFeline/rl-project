@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2022/dev/Debian) (preloaded format=pdflatex 2026.2.2)  21 JUN 2026 17:59
+This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2022/dev/Debian) (preloaded format=pdflatex 2026.2.2)  21 JUN 2026 18:58
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -474,54 +474,84 @@ File: omlptm.fd
 )
 LaTeX Font Info:    Font shape `OML/ptm/m/n' in size <9> not available
 (Font)              Font shape `OML/cmm/m/it' tried instead on input line 31.
-<fig_environments.png, id=51, 1068.8733pt x 368.93835pt>
-File: fig_environments.png Graphic file (type png)
-<use fig_environments.png>
-Package pdftex.def Info: fig_environments.png  used on input line 99.
-(pdftex.def)             Requested size: 234.8775pt x 81.07098pt.
-<fig_fourrooms.png, id=53, 722.7pt x 361.35pt>
-File: fig_fourrooms.png Graphic file (type png)
-<use fig_fourrooms.png>
-Package pdftex.def Info: fig_fourrooms.png  used on input line 136.
-(pdftex.def)             Requested size: 234.8775pt x 117.43735pt.
-<fig_ninerooms.png, id=54, 722.7pt x 361.35pt>
-File: fig_ninerooms.png Graphic file (type png)
-<use fig_ninerooms.png>
-Package pdftex.def Info: fig_ninerooms.png  used on input line 161.
-(pdftex.def)             Requested size: 234.8775pt x 117.43735pt.
 
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-<fig_deceptiverooms.png, id=55, 722.7pt x 361.35pt>
-File: fig_deceptiverooms.png Graphic file (type png)
-<use fig_deceptiverooms.png>
-Package pdftex.def Info: fig_deceptiverooms.png  used on input line 186.
-(pdftex.def)             Requested size: 234.8775pt x 117.43735pt.
-
-LaTeX Warning: `h' float specifier changed to `ht'.
+Underfull \hbox (badness 1019) in paragraph at lines 38--40
+\OT1/ptm/m/n/10 start. We show that the re-verse cur-ricu-lum
+ []
 
 [1{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}
 
 
 
- <./fig_environments.png> <./fig_fourrooms.png>] (./main.bbl
+]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [2 <./fig_ninerooms.png> <./fig_deceptiverooms.png>]) [3
+<fig_environments.png, id=101, 1068.8733pt x 368.93835pt>
+File: fig_environments.png Graphic file (type png)
+<use fig_environments.png>
+Package pdftex.def Info: fig_environments.png  used on input line 150.
+(pdftex.def)             Requested size: 234.8775pt x 81.07098pt.
+ [2 <./fig_environments.png>]
+Underfull \hbox (badness 1838) in paragraph at lines 175--177
+[]\OT1/ptm/m/n/10 Initial ex-per-i-ments with vanilla DQN on Four-Rooms
+ []
+
+<fig_fourrooms.png, id=118, 722.7pt x 361.35pt>
+File: fig_fourrooms.png Graphic file (type png)
+<use fig_fourrooms.png>
+Package pdftex.def Info: fig_fourrooms.png  used on input line 188.
+(pdftex.def)             Requested size: 234.8775pt x 117.43735pt.
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+<fig_ninerooms.png, id=119, 722.7pt x 361.35pt>
+File: fig_ninerooms.png Graphic file (type png)
+<use fig_ninerooms.png>
+Package pdftex.def Info: fig_ninerooms.png  used on input line 214.
+(pdftex.def)             Requested size: 234.8775pt x 117.43735pt.
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+
+Underfull \vbox (badness 1708) has occurred while \output is active []
+
+<fig_deceptiverooms.png, id=120, 722.7pt x 361.35pt>
+File: fig_deceptiverooms.png Graphic file (type png)
+<use fig_deceptiverooms.png>
+Package pdftex.def Info: fig_deceptiverooms.png  used on input line 240.
+(pdftex.def)             Requested size: 234.8775pt x 117.43735pt.
+
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+
+LaTeX Warning: `h' float specifier changed to `ht'.
+
+[3 <./fig_fourrooms.png>]
+Underfull \vbox (badness 4479) has occurred while \output is active []
+
+
+Underfull \hbox (badness 1910) in paragraph at lines 288--297
+[]\OT1/ptm/m/n/10 Start-state cur-ricu-lum pro-vides clear sample-efficiency
+ []
+
+(./main.bbl
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [4 <./fig_ninerooms.png> <./fig_deceptiverooms.png>]) [5
 
 ] (./main.aux)
 Package rerunfilecheck Info: File `main.out' has not changed.
 (rerunfilecheck)             Checksum: 9AD1CC00CD4EB7716EB5E6C9F7EABD1C;1136.
  ) 
 Here is how much of TeX's memory you used:
- 11135 strings out of 480247
- 169434 string characters out of 5896152
- 472446 words of memory out of 5000000
- 28869 multiletter control sequences out of 15000+600000
+ 11160 strings out of 480247
+ 169966 string characters out of 5896152
+ 473928 words of memory out of 5000000
+ 28886 multiletter control sequences out of 15000+600000
  495173 words of font info for 78 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
  60i,11n,69p,784b,449s stack positions out of 5000i,500n,10000p,200000b,80000s
@@ -530,15 +560,17 @@ e/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/share/texlive/texm
 f-dist/fonts/type1/public/amsfonts/cm/cmmi6.pfb></usr/share/texlive/texmf-dist/
 fonts/type1/public/amsfonts/cm/cmmi9.pfb></usr/share/texlive/texmf-dist/fonts/t
 ype1/public/amsfonts/cm/cmr10.pfb></usr/share/texlive/texmf-dist/fonts/type1/pu
-blic/amsfonts/cm/cmsy10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/a
-msfonts/cm/cmti9.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmb8
-a.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/sha
+blic/amsfonts/cm/cmr7.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/ams
+fonts/cm/cmsy10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/
+cm/cmsy7.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cmti
+9.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/sha
 re/texlive/texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/share/texlive/texm
-f-dist/fonts/type1/urw/times/utmri8a.pfb>
-Output written on main.pdf (3 pages, 579233 bytes).
+f-dist/fonts/type1/urw/times/utmr8a.pfb></usr/share/texlive/texmf-dist/fonts/ty
+pe1/urw/times/utmri8a.pfb>
+Output written on main.pdf (5 pages, 615260 bytes).
 PDF statistics:
- 148 PDF objects out of 1000 (max. 8388607)
- 113 compressed objects within 2 object streams
- 25 named destinations out of 1000 (max. 500000)
+ 207 PDF objects out of 1000 (max. 8388607)
+ 166 compressed objects within 2 object streams
+ 33 named destinations out of 1000 (max. 500000)
  109 words of extra memory for PDF output out of 10000 (max. 10000000)
 

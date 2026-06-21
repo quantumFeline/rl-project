@@ -32,62 +32,113 @@
 
 % ===========================================================================
 \begin{abstract}
-% ~150 words. State: (1) problem, (2) what we did, (3) key finding.
-% Draft after the rest is written.
-TODO
+Curriculum learning over initial states has been shown to accelerate
+training in sparse-reward environments, but existing work evaluates these methods almost exclusively with on-policy algorithms. We test whether the same approach benefits off-policy learning, where a replay buffer already provides sample reuse.
+
+We compare four start-state selection strategies with Double DQN on three MiniGrid grid-world environments of varying structure: a distance-based reverse curriculum, TD-error-based selection,
+uniform random placement, and a fixed start. We show that the reverse curriculum reaches peak performance within 10-40k steps across all environments, far ahead of the other selectors.
 \end{abstract}
 
 % ===========================================================================
 \section{Introduction}
 \label{sec:intro}
 
-% ~0.5 page. Structure:
-% - Sparse reward + hard exploration is a core RL challenge
-% - Curriculum over start states is a known approach (cite Florensa 2017,
-%   Florensa et al. 2018 / 1811.11298)
-% - Existing work focuses on on-policy algorithms (PPO). Unclear whether
-%   start-state curriculum helps off-policy methods that already have a
-%   replay buffer for data reuse
-% - Our contribution: replicate curriculum strategies from 1811.11298 with
-%   DQN on MiniGrid grid worlds. Compare Reverse curriculum, TD-error-based
-%   selection, Uniform, and Fixed baselines across environments of varying
-%   structure
-% - Preview of findings (one sentence)
+Sparse rewards make reinforcement learning hard: the agent must explore
+extensively before encountering any learning signal, and without that
+signal it has no basis to improve its policy. A natural way to mitigate it is to start episodes closer to the goal, where success
+is easier, and gradually expand the starting region as the agent improves. This idea has been explored as reverse
+curriculum~\cite{florensa2017reverse} and TD-error-based start-state
+selection~\cite{florensa2018automatic}, and is related to the
+archive-and-return strategy of Go-Explore~\cite{ecoffet2021goexplore} and the contrastive initial state buffer of Messikommer et
+al.~\cite{messikommer2024cisb}.
+
+These methods have been evaluated primarily with on-policy algorithms
+(TRPO, PPO), where each trajectory is used once and the start-state
+distribution directly determines what the agent trains on. Off-policy
+methods such as DQN already decouple data collection from training through a replay buffer. It is not obvious that controlling the start-state distribution provides additional benefit when past experience is already
+being reused.
+
+We investigate this question by comparing four start-state selectors with Double DQN on three MiniGrid environments. We find that reverse curriculum provides efficiency gains even in the off-policy setting,
+and that TD-error-based selection suffers from additional problems but shows promise.
 
 % ===========================================================================
 \section{Background}
 \label{sec:background}
 
-% ~0.5 page. Cover:
-% - DQN: Q-learning with function approximation, replay buffer, target
-%   network. Note: Double DQN, soft target updates (Polyak averaging)
-% - Curriculum learning over initial states: the idea that controlling where
-%   episodes start can shape the learning trajectory
-% - Reverse curriculum (Florensa et al., 2017): expand distance bands from
-%   goal as competence grows
-% - TD-error-based selection (1811.11298): start where prediction error is
-%   highest
-% - Briefly note the gap: these were studied with PPO on continuous-control
-%   tasks, not with off-policy discrete-action methods
+\paragraph{Deep Q-Networks.}
+DQN~\cite{mnih2015dqn} extends Q-learning into high-dimensional
+state spaces by approximating the action-value function $Q(s,a)$ with a
+neural network. It uses two mechanisms to stabilise the training: a \emph{replay buffer} that stores past transitions and samples mini-batches uniformly, decorrelating gradient updates; and a \emph{target network}, a delayed copy of the Q-network used to compute bootstrap targets. Double DQN~\cite{van2016double}, used in this work, further combats overestimation bias by decoupling action selection from action evaluation (online vs target network).
+
+\paragraph{Curriculum over initial states.}
+In sparse-reward environments, the agent may rarely encounter the goal which makes the initial learning curve prohibitively slow. One remedy is to control \emph{where} episodes begin. Florensa et al.~\cite{florensa2017reverse} propose a \emph{reverse
+curriculum}: episodes initially start near the goal, and the start
+distribution expands outward as the agent demonstrates competence,
+gradually covering the full state space. Their evaluation uses TRPO, an
+on-policy method. Florensa et al.~\cite{florensa2018automatic} additionally introduce automatic goal generation and select start states where the agent's \emph{TD~error} is highest. This directs training toward regions of maximum prediction uncertainty.
+
+\paragraph{Related approaches.}
+Go-Explore~\cite{ecoffet2021goexplore} addresses the same hard-exploration problem by using an archive of visited states, \emph{returning} to promising ones, and exploring from there. The Contrastive Initial State Buffer~\cite{messikommer2024cisb} selects replay-buffer states as episode initialisations for robotic control tasks. It uses on-policy PPO as its base learner.
+
+\paragraph{Gap.} A common thread across these works is the reliance on \emph{on-policy} algorithms. For on-policy methods, each trajectory is used once and discarded, so controlling where episodes start directly determines the training distribution. For \emph{off-policy} methods such as DQN, a replay buffer already decouples the data collection distribution from the training distribution, providing sample reuse independently of the start-state policy. It is therefore unclear whether manipulating the initial state distribution provides comparable benefit in the off-policy setting, or whether the replay buffer already captures most of the gain.
 
 % ===========================================================================
 \section{Method}
 \label{sec:method}
 
-% ~0.75 page.
-
 \subsection{Agent}
-% Double DQN, MLP Q-network (architecture), Huber loss, soft target updates
-% (tau), epsilon-greedy with linear annealing, replay buffer (numpy-backed).
-% Hyperparameters table (compact).
+We use a Double DQN~\cite{van2016double} with a two-hidden-layer
+MLP (128 units each, ReLU activations) mapping the 3-dimensional
+observation to Q-values over the action space. We use Huber loss instead
+of MSE to reduce sensitivity to large TD errors, and clip gradients at
+$\lVert\cdot\rVert \le 10$. The target network is updated via Polyak
+averaging ($\tau = 0.005$) after every gradient step instead of the
+periodic hard copy used in the original DQN. Exploration uses
+$\varepsilon$-greedy with linear annealing from 1.0 to 0.1 over 80\% of
+training. The replay buffer stores $10^5$ transitions. One gradient step
+is taken every 4 environment steps, starting after 1000 transitions.
+Table~\ref{tab:hyperparams} lists the full hyperparameter set.
+
+\begin{table}[h]
+\caption{Agent hyperparameters.}
+\label{tab:hyperparams}
+\centering
+\begin{tabular}{ll}
+\toprule
+Parameter & Value \\
+\midrule
+Hidden layers      & 2 $\times$ 128 (ReLU) \\
+Learning rate      & $5 \times 10^{-4}$ (Adam) \\
+Discount $\gamma$  & 0.99 \\
+Batch size         & 128 \\
+Replay capacity    & $10^5$ \\
+Target update $\tau$ & 0.005 \\
+$\varepsilon$ schedule & $1.0 \to 0.1$ (linear, 80\% of steps) \\
+Gradient clip      & max norm 10 \\
+Train every        & 4 steps \\
+Learning starts    & 1000 steps \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The choice of Double DQN over vanilla DQN is discussed in
+Section~\ref{sec:stability}.
 
 \subsection{Start-State Selectors}
-% Describe all four:
-% - Fixed: always (1,1), worst-case baseline
-% - Uniform: random free cell, standard baseline
-% - Reverse: BFS distance bands, frontier-aware expansion
-% - TDError: per-cell EMA of |TD error|, proportional sampling
-% One paragraph each, enough to reproduce.
+Each episode, a selector picks a free cell as the agent's start position. The selectors differ only in how they choose that cell; the agent and environment are otherwise identical across conditions.
+
+\paragraph{Fixed.} Always starts the agent at cell $(1, 1)$ (top-left
+corner). This is the worst-case baseline: a single, distant start with no curriculum.
+
+\paragraph{Uniform.} Samples a free cell uniformly at random. This is the standard baseline: the agent sees a representative spread of start
+positions, but with no bias toward easier or harder ones.
+
+\paragraph{Reverse.} Inspired by Florensa et
+al.~\cite{florensa2017reverse}. Cells are grouped into bands by BFS
+shortest-path distance from the goal. Training begins with starts sampled only from the closest bands. When the agent's success rate (rolling window of 20 episodes) on the current outermost band exceeds 70\%, the band expands by one distance level. To prevent short near-goal episodes from inflating the success count, only the episodes that actually start on the frontier band count toward expansion.
+
+\paragraph{TDError.} Inspired by Florensa et
+al.~\cite{florensa2018automatic}. Maintains a per-cell exponential moving average ($\alpha = 0.1$) of absolute TD errors from training batches. Cells with higher error are sampled proportionally, with a bias toward the regions where the Q-network's predictions are least accurate. A small floor ($\varepsilon = 0.01$) prevents unvisited cells from being permanently ignored.
 
 \subsection{Environments}
 All environments use the MiniGrid framework~\cite{minigrid} with a
@@ -118,18 +169,19 @@ two-ring spiral surrounding the goal. Cells inside the spiral have low BFS dista
 \section{Experiments}
 \label{sec:experiments}
 
-% ~0.75 page.
-
 \subsection{DQN Stability}
-% Brief account of the instability encountered with vanilla DQN on sparse
-% reward (collapse at 30-40k steps) and the fixes applied.
-% This motivates the final hyperparameter choices and shows that agent
-% stability is a prerequisite for meaningful curriculum comparison.
+\label{sec:stability}
+
+Initial experiments with vanilla DQN on FourRooms showed that all four selectors would begin learning, then collapse to 0\% success rate around 30-40k steps and never recover. The cause was Q-value overestimation. Double DQN~\cite{van2016double} addresses this by using the online network to select actions and the target network to evaluate them. This approach is well-established: Van Hasselt et al.\ demonstrated elimination of overestimation on Atari benchmarks, and Double DQN has since become the standard. In our setting, it eliminated the
+collapse entirely.
+
+Three further changes were needed: reducing the update frequency from
+every step to every 4 steps to prevent overfitting to the small number of transitions early in training; Huber loss with gradient
+clipping to reduce the impact of outlier TD errors; and replacing the hard target copy with Polyak averaging ($\tau = 0.005$) to remove discontinuity that caused oscillations in the learning curve.
 
 \subsection{Results}
-% Per-environment comparison. For each environment:
-% - Learning curve figure (the comparison plot)
-% - 2-3 sentences describing the ranking and key pattern
+All tables report the peak of the rolling-50-episode success rate up to
+the given step count (rolling max, not instantaneous value).
 
 \begin{figure}[h]
 \centering
@@ -139,6 +191,7 @@ two-ring spiral surrounding the goal. Cells inside the spiral have low BFS dista
 \end{figure}
 
 \paragraph{FourRooms (100k steps).}
+Reverse reaches 100\% within 10k steps, dips briefly around 20-30k as the band expands through the doorway bottlenecks, then recovers and holds above 90\%. TDError and Uniform track together around 30-40\%, with TDError pulling slightly ahead late. Fixed stays near zero until 60k steps, then climbs slowly.
 
 \begin{table}[h]
 \caption{Peak rolling-50 success rate on FourRooms.}
@@ -164,6 +217,7 @@ Reverse  & \textbf{1.00} & \textbf{1.00} \\
 \end{figure}
 
 \paragraph{NineRooms (200k steps).}
+Reverse again reaches 100\% early and fluctuates between 80-100\% as the band expands across the larger grid. TDError starts alongside Uniform but overtakes it after 100k steps, reaching 100\% by 175k. Fixed remains at zero until around 80k, then climbs steeply to 100\% by 200k. Given enough steps, all selectors except Uniform converge to full success.
 
 \begin{table}[h]
 \caption{Peak rolling-50 success rate on NineRooms.}
@@ -189,6 +243,7 @@ Reverse  & \textbf{1.00} & \textbf{1.00} & \textbf{1.00} & \textbf{1.00} \\
 \end{figure}
 
 \paragraph{DeceptiveRooms (150k steps).}
+Reverse reaches 100\% by 10k steps but shows more late-game variance than on the other environments, dipping to around 70\% at times. TDError and Uniform track together until 50k, then both climb to near 100\% by 90k. TDError slightly leads Uniform during the climb. Fixed never exceeds 15\%. This is the only environment where TDError visibly outpaces Uniform.
 
 \begin{table}[h]
 \caption{Peak rolling-50 success rate on DeceptiveRooms.}
@@ -206,17 +261,20 @@ Reverse  & \textbf{1.00} & \textbf{1.00} & \textbf{1.00} \\
 \end{tabular}
 \end{table}
 
+The results above use the stabilised Double DQN agent
+(Section~\ref{sec:stability}). Before the stability fixes, the gap between Reverse and the other selectors was even wider: Fixed never reached any reasonable performance, and Uniform showed much larger oscillations before collapsing entirely. The stabilisation narrowed the gap by making all selectors viable, but did not change the ranking.
+
 % ===========================================================================
 \section{Discussion}
 \label{sec:discussion}
 
-Reverse curriculum consistently learns fastest - it reaches peak success rate within 10,000 to 40,000 environment steps across all three environments. There are two reasons for this advantage. First, knowledge of BFS distances and goal location is implicitly built-in in its training regimen. Second, short, near-goal episodes under it yield higher reward signal, which particularly matters during the early training stages. After enough steps, this early advantage is mostly neutralised - in NineRooms setup, all starting location selection methods ultimately reach the same performance, and likely similar picture would arise in the two other regimen with more training time.
+Reverse curriculum consistently learns fastest - it reaches peak success rate within 10,000 to 40,000 environment steps across all three environments. There are two reasons for this advantage. First, knowledge of BFS distances and goal location is implicitly built-in in its training regimen. Second, short, near-goal episodes under it yield higher reward signal, which particularly matters during the early training stages. After enough steps, this early advantage is mostly neutralised - in NineRooms setup, all starting location selection methods ultimately reach the same performance, and likely similar picture would arise in the two other environments with more training time.
 
 The downside of Reverse curriculum is its lower stability after reaching the stably high performance, in comparison to TDError and Uniform which nearly flatten out after reaching the 100\% performance once. This behaviour does not improve with lower learning rate and/or annealing, and is likely connected to the non-stationary training distribution. The Q-network was trained predominantly on near-goal transitions, and when it gets start states from regions it has less experience with, it degrades. The replay buffer softens this effect but doesn't eliminate it, because near-goal episodes are short (few transitions per episode) while far-start episodes are long (many transitions), so the buffer gradually skews toward the newer, harder transitions.
 
 TD-error-based selection, despite being a more sophisticated mechanism,
 tracks next to Uniform in sample efficiency rather than next to
-Reverse. The presumed reason for this is the cold-start. TDError's per-cell error estimates begin uninformative (initialised at a small floor value), so early-game sampling is effectively uniform random. The curriculum only becomes meaningful after the agent has trained on enough transitions to produce spatially varied TD errors, by which point the Reverse selector has already built a near-complete policy. On DeceptiveRooms, however, where BFS distance is a poor proxy for navigational difficulty, TDError narrows the gap with Reverse and overtakes Uniform, which suggests that learned difficulty signals may have value when geometric priors are misleading. However, it suffers from performance instability even moreso than Reverse.
+Reverse. The presumed reason for this is the cold-start. TDError's per-cell error estimates begin uninformative (initialised at a small floor value), so early-game sampling is effectively uniform random. The curriculum only becomes meaningful after the agent has trained on enough transitions to produce spatially varied TD errors, by which point the Reverse selector has already built a near-complete policy. On DeceptiveRooms, however, where BFS distance is a poor proxy for navigational difficulty, TDError narrows the gap with Reverse and overtakes Uniform, which suggests that learned difficulty signals may have value when geometric priors are misleading. However, it suffers from performance instability even more so than Reverse.
 
 The off-policy replay buffer and the start-state curriculum complement each other: replay addresses sample \emph{reuse}, while the curriculum addresses reward \emph{encounter} so that the agent sees successful
 trajectories early enough to bootstrap learning.
@@ -227,15 +285,15 @@ The main limitations of this study are the small grid environments with a simpli
 \section{Conclusion}
 \label{sec:conclusion}
 
-% ~3-4 sentences.
-% - Reverse curriculum provides clear sample-efficiency gains for DQN on
-%   sparse-reward grid navigation
-% - TD-error-based selection is less effective but shows promise when
-%   distance is a poor difficulty proxy
-% - Off-policy replay buffer complements rather than replaces start-state
-%   curriculum: they address different aspects of the exploration problem
-% - Future work: on-policy comparison, larger/continuous environments,
-%   adaptive curriculum methods
+Start-state curriculum provides clear sample-efficiency gains for
+off-policy DQN on sparse-reward grid navigation, with the reverse
+curriculum reaching peak performance an order of magnitude faster than
+baselines across all tested environments. TD-error-based selection is less effective, but narrows the gap when distance-based
+priors are misleading. The replay buffer and the curriculum address
+different aspects of the exploration problem: the buffer provides sample
+reuse, the curriculum ensures reward encounter. Future work could compare directly against on-policy baselines, scale to larger or continuous
+environments, and explore hybrid curricula that combine distance priors
+with learned difficulty signals.
 
 % ===========================================================================
 % \section*{Acknowledgements}
