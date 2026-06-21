@@ -1,5 +1,6 @@
 import gymnasium as gym
 import minigrid  # noqa: F401 (registers MiniGrid envs with gymnasium)
+import envs  # noqa: F401 (registers custom envs)
 
 from envs.wrappers import StartStateWrapper, ActionWrapper, PosObsWrapper
 

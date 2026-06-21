@@ -5,7 +5,7 @@ from datetime import datetime
 
 import torch
 
-from train import train, make_selector
+from train import train, make_selector, env_config
 from plot import plot_comparison
 
 
@@ -15,11 +15,12 @@ SELECTORS = ["fixed", "uniform", "reverse", "tderror"]
 def run_comparison(
     selectors: list[str],
     env_id: str,
-    goal: tuple[int, int],
     total_steps: int,
     seed: int,
     device: torch.device,
 ):
+    cfg = env_config(env_id)
+    goal = cfg["goal"]
     results = {}
 
     for name in selectors:
@@ -36,7 +37,7 @@ def run_comparison(
             selector=selector,
             selector_name=name,
             fixed_goal=goal,
-            max_steps=200,
+            max_steps=cfg["max_steps"],
         )
         results[name] = (steps, successes)
 
@@ -64,11 +65,9 @@ if __name__ == "__main__":
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"device: {device}")
 
-    goal = (17, 1)
     run_comparison(
         selectors=args.selectors,
         env_id=args.env,
-        goal=goal,
         total_steps=args.total_steps,
         seed=args.seed,
         device=device,

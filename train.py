@@ -34,7 +34,8 @@ def train(
     obs_dim = env.observation_space.shape[0]
     n_actions = env.action_space.n
 
-    agent = DQNAgent(obs_dim, n_actions, device=device)
+    agent = DQNAgent(obs_dim, n_actions, device=device,
+                      epsilon_decay_steps=int(0.8 * total_steps))
     buffer = ReplayBuffer(capacity=buffer_capacity, obs_dim=obs_dim)
 
     # Episode tracking: each entry is (step_at_which_episode_ended, success_bool)
@@ -148,6 +149,19 @@ def make_selector(name: str, seed: int, goal: tuple[int, int]):
     raise ValueError(f"Unknown selector: {name}")
 
 
+ENV_DEFAULTS = {
+    "MiniGrid-FourRooms-v0": {"goal": (17, 1), "max_steps": 200},
+    "NineRooms-v0":          {"goal": (23, 23), "max_steps": 400},
+    "DeceptiveRooms-v0":     {"goal": (11, 11), "max_steps": 300},
+}
+
+
+def env_config(env_id: str) -> dict:
+    if env_id in ENV_DEFAULTS:
+        return ENV_DEFAULTS[env_id]
+    return {"goal": None, "max_steps": 200}
+
+
 if __name__ == "__main__":
     import argparse
 
@@ -168,7 +182,8 @@ if __name__ == "__main__":
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"device: {device}")
 
-    goal = (17, 1)
+    cfg = env_config(args.env)
+    goal = cfg["goal"]
     selector = make_selector(args.selector, args.seed, goal)
     print(f"selector: {args.selector} | env: {args.env} | seed: {args.seed} | steps: {args.total_steps}")
 
@@ -180,5 +195,5 @@ if __name__ == "__main__":
         selector=selector,
         selector_name=args.selector,
         fixed_goal=goal,
-        max_steps=200,
+        max_steps=cfg["max_steps"],
     )
