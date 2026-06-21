@@ -1,0 +1,160 @@
+% Uses the ICML style (compact, well-suited for 3-4 pages)
+\documentclass[accepted]{icml2024}
+
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{hyperref}
+
+\icmltitlerunning{Initial State Distribution Manipulation for Off-Policy RL}
+
+\begin{document}
+
+\twocolumn[
+\icmltitle{Initial State Distribution Manipulation\\for Off-Policy Reinforcement Learning}
+
+\icmlsetsymbol{equal}{*}
+
+\begin{icmlauthorlist}
+\icmlauthor{TODO: Author Name}{todo}
+\end{icmlauthorlist}
+
+\icmlaffiliation{todo}{TODO: University, Department}
+
+\icmlcorrespondingauthor{TODO: Author Name}{veronika.netch@gmail.com}
+
+\icmlkeywords{reinforcement learning, curriculum learning, DQN, initial state distribution}
+
+\vskip 0.3in
+]
+
+\printAffiliationsAndNotice{}
+
+% ===========================================================================
+\begin{abstract}
+% ~150 words. State: (1) problem, (2) what we did, (3) key finding.
+% Draft after the rest is written.
+TODO
+\end{abstract}
+
+% ===========================================================================
+\section{Introduction}
+\label{sec:intro}
+
+% ~0.5 page. Structure:
+% - Sparse reward + hard exploration is a core RL challenge
+% - Curriculum over start states is a known approach (cite Florensa 2017,
+%   Florensa et al. 2018 / 1811.11298)
+% - Existing work focuses on on-policy algorithms (PPO). Unclear whether
+%   start-state curriculum helps off-policy methods that already have a
+%   replay buffer for data reuse
+% - Our contribution: replicate curriculum strategies from 1811.11298 with
+%   DQN on MiniGrid grid worlds. Compare Reverse curriculum, TD-error-based
+%   selection, Uniform, and Fixed baselines across environments of varying
+%   structure
+% - Preview of findings (one sentence)
+
+% ===========================================================================
+\section{Background}
+\label{sec:background}
+
+% ~0.5 page. Cover:
+% - DQN: Q-learning with function approximation, replay buffer, target
+%   network. Note: Double DQN, soft target updates (Polyak averaging)
+% - Curriculum learning over initial states: the idea that controlling where
+%   episodes start can shape the learning trajectory
+% - Reverse curriculum (Florensa et al., 2017): expand distance bands from
+%   goal as competence grows
+% - TD-error-based selection (1811.11298): start where prediction error is
+%   highest
+% - Briefly note the gap: these were studied with PPO on continuous-control
+%   tasks, not with off-policy discrete-action methods
+
+% ===========================================================================
+\section{Method}
+\label{sec:method}
+
+% ~0.75 page.
+
+\subsection{Agent}
+% Double DQN, MLP Q-network (architecture), Huber loss, soft target updates
+% (tau), epsilon-greedy with linear annealing, replay buffer (numpy-backed).
+% Hyperparameters table (compact).
+
+\subsection{Start-State Selectors}
+% Describe all four:
+% - Fixed: always (1,1), worst-case baseline
+% - Uniform: random free cell, standard baseline
+% - Reverse: BFS distance bands, frontier-aware expansion
+% - TDError: per-cell EMA of |TD error|, proportional sampling
+% One paragraph each, enough to reproduce.
+
+\subsection{Environments}
+% MiniGrid framework, gymnasium wrappers, observation = [col, row, dir].
+% Three environments:
+% - FourRooms (19x19, standard, BFS = good difficulty proxy)
+% - NineRooms (25x25, custom, more doorways)
+% - DeceptiveRooms (19x19, custom, spiral around goal, BFS != difficulty)
+% Include small grid diagrams or reference appendix figures.
+% Explain goal pinning and why it is necessary.
+
+% ===========================================================================
+\section{Experiments}
+\label{sec:experiments}
+
+% ~0.75 page.
+
+\subsection{DQN Stability}
+% Brief account of the instability encountered with vanilla DQN on sparse
+% reward (collapse at 30-40k steps) and the fixes applied.
+% This motivates the final hyperparameter choices and shows that agent
+% stability is a prerequisite for meaningful curriculum comparison.
+
+\subsection{Results}
+% Per-environment comparison. For each environment:
+% - Learning curve figure (the comparison plot)
+% - 2-3 sentences describing the ranking and key pattern
+% Summary table across all environments (final success, peak success).
+
+% ===========================================================================
+\section{Discussion}
+\label{sec:discussion}
+
+% ~0.5 page. Structure:
+% - Reverse consistently learns fastest. Why: "easy first" inductive bias +
+%   episode count advantage (short near-goal episodes = more reward signal
+%   per env step)
+% - TDError's weakness: no inductive bias early on; needs many episodes to
+%   build meaningful per-cell signal; does not distinguish "hard frontier"
+%   from "impossibly hard right now"
+% - TDError's partial success on DeceptiveRooms: when BFS distance is a poor
+%   difficulty proxy, TDError's agnostic approach is more competitive
+% - Difference from the original paper: PPO (on-policy, no replay) vs DQN
+%   (off-policy, replay buffer). Replay buffer already provides sample reuse,
+%   so curriculum's main benefit shifts from data efficiency to ensuring
+%   reward encounter (coverage argument)
+% - Limitations: single seed (or few seeds), small environments, simplified
+%   observation, no comparison to on-policy methods
+
+% ===========================================================================
+\section{Conclusion}
+\label{sec:conclusion}
+
+% ~3-4 sentences.
+% - Reverse curriculum provides clear sample-efficiency gains for DQN on
+%   sparse-reward grid navigation
+% - TD-error-based selection is less effective but shows promise when
+%   distance is a poor difficulty proxy
+% - Off-policy replay buffer complements rather than replaces start-state
+%   curriculum: they address different aspects of the exploration problem
+% - Future work: on-policy comparison, larger/continuous environments,
+%   adaptive curriculum methods
+
+% ===========================================================================
+% \section*{Acknowledgements}
+% Optional.
+
+\bibliography{refs}
+\bibliographystyle{icml2024}
+
+\end{document}
