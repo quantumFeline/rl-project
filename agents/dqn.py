@@ -27,11 +27,11 @@ class DQNAgent:
         obs_dim: int,
         n_actions: int,
         device: torch.device,
-        lr: float = 1e-4,
+        lr: float = 5e-4,
         gamma: float = 0.99,
         epsilon_start: float = 1.0,
-        epsilon_end: float = 0.05,
-        epsilon_decay_steps: int = 50_000,
+        epsilon_end: float = 0.1,
+        epsilon_decay_steps: int = 80_000,
     ):
         self.n_actions = n_actions
         self.device = device
