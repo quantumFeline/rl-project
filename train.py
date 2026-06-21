@@ -52,13 +52,21 @@ def train(
         episode_return += reward
 
         if terminated or truncated:
-            episode_log.append((step, episode_return > 0))
+            success = episode_return > 0
+            episode_log.append((step, success))
+            selector.update(success=success)
             episode_return = 0.0
             obs, _ = env.reset()
 
         if step >= learning_starts and step % train_every == 0:
             batch = buffer.sample(batch_size)
-            agent.update(batch)
+            td_errors = agent.update(batch)
+            selector.update(
+                obs_batch=batch.obs.numpy(),
+                td_errors=td_errors,
+                grid_w=env.unwrapped.width,
+                grid_h=env.unwrapped.height,
+            )
 
         if step % target_update_every == 0:
             agent.sync_target()

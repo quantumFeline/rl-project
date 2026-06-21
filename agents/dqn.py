@@ -62,9 +62,9 @@ class DQNAgent:
             q_values = self.q_net(obs_t.unsqueeze(0))  # add batch dim
             return int(q_values.argmax(dim=1).item())
 
-    def update(self, batch) -> float:
+    def update(self, batch) -> np.ndarray:
         """One gradient step on a batch from the replay buffer.
-        Returns mean absolute TD error."""
+        Returns per-sample absolute TD errors as a numpy array, shape (batch_size,)."""
         obs = batch.obs.to(self.device)
         actions = batch.actions.to(self.device)
         rewards = batch.rewards.to(self.device)
@@ -88,7 +88,7 @@ class DQNAgent:
         loss.backward()
         self.optimizer.step()
 
-        return td_error.abs().mean().item()
+        return td_error.abs().detach().cpu().numpy()
 
     def sync_target(self) -> None:
         """Hard-copy Q-network weights into the target network."""
